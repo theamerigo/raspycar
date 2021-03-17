@@ -1,23 +1,20 @@
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
-import RPi.GPIO as gpio
-import time
-import sys
-import signal
-import math
 
 
 class PIDSubscriber(Node):
 
-    def __init__(self, P, I, D, min, max, target):
+    def __init__(self, P, I, D, min, max, target, period):
         super().__init__('pid_subscriber')
         self.subscription = self.create_subscription(
             String,
-            'topic',
+            'topic1',
             self.pid_control,
             10)
+        self.publisher = self.create_publisher(String, 'topic2', 10)
         self.subscription  # prevent unused variable warning
+        self.period = period
         self.P = P
         self.I = I
         self.D = D
@@ -28,9 +25,7 @@ class PIDSubscriber(Node):
         self.max = max
         self.target = target
         self.control = 0
-
-    def listener_callback(self, msg):
-        self.get_logger().info('I heard: "%s"' % msg.data)
+        self.timer = self.create_timer(self.period, self.send_control)
 
     def pid_control(self, msg):
         self.get_logger().info('I heard: "%s"' % msg.data)
@@ -46,10 +41,16 @@ class PIDSubscriber(Node):
             self.control = self.min
         self.get_logger().info('I calculate pid control = "%f"' % self.control)
 
+    def send_control(self):
+        msg = String()
+        msg.data = 'Duty Cycle: %f' % self.control
+        self.publisher.publish(msg)
+        self.get_logger().info('Publishing: "%s"' % msg.data)
+
 def main(args=None):
     rclpy.init(args=args)
 
-    pid_subscriber = PIDSubscriber(1, 1, 0, 0, 100, 35)
+    pid_subscriber = PIDSubscriber(1, 1, 0, 0, 100, 35, 0.5)
 
     rclpy.spin(pid_subscriber)
 

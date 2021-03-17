@@ -12,7 +12,7 @@ class EncoderPublisher(Node):
 
     def __init__(self, pin, period):
         super().__init__('encoder_publisher')
-        self.publisher_ = self.create_publisher(String, 'topic', 10)
+        self.publisher_ = self.create_publisher(String, 'topic1', 10)
         self.period = period   # seconds
         self.timer = self.create_timer(self.period, self.get_speed)
         self.pin = pin
@@ -21,7 +21,6 @@ class EncoderPublisher(Node):
         gpio.setmode(gpio.BCM)
         print('Setup Interrupt on gpio ' + str(self.pin))
         gpio.setup(self.pin, gpio.IN, pull_up_down=gpio.PUD_UP)
-        #gpio.add_event_detect(self.pin, gpio.RISING, callback=self.encoder_signal_interrupt)
         gpio.add_event_detect(self.pin, gpio.RISING)
         gpio.add_event_callback(self.pin, self.encoder_signal_interrupt)
 

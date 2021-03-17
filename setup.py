@@ -22,6 +22,7 @@ setup(
         'console_scripts': [
                 'encoder = raspycar_pkg.encoder:main',
                 'pid = raspycar_pkg.pid:main',
+                'motor = raspycar_pkg.motor:main',
         ],
     },
 )
