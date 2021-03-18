@@ -29,9 +29,10 @@ class PIDSubscriber(Node):
 
     def pid_control(self, msg):
         self.get_logger().info('I heard: "%s"' % msg.data)
-        data = msg.data
-        vec = data.split(':')
-        speed = float(vec[1])
+        #data = msg.data
+        #vec = data.split(':')
+        #speed = float(vec[1])
+        speed = float(msg.data)
         error = self.target - speed
         self.integral += error
         self.control = self.P * error + self.I * self.integral
@@ -43,9 +44,9 @@ class PIDSubscriber(Node):
 
     def send_control(self):
         msg = String()
-        msg.data = 'Duty Cycle: %f' % self.control
+        msg.data = str(self.control)
         self.publisher.publish(msg)
-        self.get_logger().info('Publishing: "%s"' % msg.data)
+        self.get_logger().info('Publishing Duty Cycle: "%s"' % msg.data)
 
 def main(args=None):
     rclpy.init(args=args)

@@ -20,6 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+                'reference = raspycar_pkg.reference:main',
                 'encoder = raspycar_pkg.encoder:main',
                 'pid = raspycar_pkg.pid:main',
                 'motor = raspycar_pkg.motor:main',

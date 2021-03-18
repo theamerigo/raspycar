@@ -31,9 +31,9 @@ class MotorSubscriber(Node):
 
     def control_motor(self, msg):
         self.get_logger().info('I heard: "%s"' % msg.data)
-        data = msg.data
-        vec = data.split(':')
-        duty_cycle = float(vec[1])
+        #data = msg.data
+        #vec = data.split(':')
+        duty_cycle = float(msg.data)
         self.pwm.ChangeDutyCycle(duty_cycle)
         time.sleep(self.period)
 

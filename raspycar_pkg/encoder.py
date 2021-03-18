@@ -30,9 +30,10 @@ class EncoderPublisher(Node):
         rps = tps / 20
         self.speed = 2 * math.pi * rps
         self.tick = 0
-        msg.data = 'Speed: %f' % self.speed
+        #msg.data = 'Speed: %f' % self.speed
+        msg.data = str(self.speed)
         self.publisher_.publish(msg)
-        self.get_logger().info('Publishing: "%s"' % msg.data)
+        self.get_logger().info('Publishing Speed: "%s"' % msg.data)
 
     def encoder_signal_interrupt(self, channel):
         self.tick += 1
