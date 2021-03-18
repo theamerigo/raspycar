@@ -5,7 +5,7 @@ from std_msgs.msg import String
 
 class PIDSubscriber(Node):
 
-    def __init__(self, P, I, D, min, max, target, period):
+    def __init__(self, P, I, D, min, max, period):
         super().__init__('pid_subscriber')
         self.subscription = self.create_subscription(
             String,
@@ -23,17 +23,16 @@ class PIDSubscriber(Node):
         self.derivative = 0
         self.min = min
         self.max = max
-        self.target = target
         self.control = 0
         self.timer = self.create_timer(self.period, self.send_control)
 
     def pid_control(self, msg):
         self.get_logger().info('I heard: "%s"' % msg.data)
-        #data = msg.data
-        #vec = data.split(':')
-        #speed = float(vec[1])
-        speed = float(msg.data)
-        error = self.target - speed
+        data = msg.data
+        vec = data.split(':')
+        speed = float(vec[0])
+        target = float(vec[1])
+        error = target - speed
         self.integral += error
         self.control = self.P * error + self.I * self.integral
         if self.control > self.max:
@@ -51,7 +50,7 @@ class PIDSubscriber(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    pid_subscriber = PIDSubscriber(1, 1, 0, 0, 100, 35, 0.5)
+    pid_subscriber = PIDSubscriber(1, 1, 0, 0, 100, 0.5)
 
     rclpy.spin(pid_subscriber)
 
