@@ -35,7 +35,8 @@ class MotorSubscriber(Node):
         #vec = data.split(':')
         duty_cycle = float(msg.data)
         self.pwm.ChangeDutyCycle(duty_cycle)
-        time.sleep(self.period)
+        if duty_cycle > 0:
+            time.sleep(self.period)
 
 
 
