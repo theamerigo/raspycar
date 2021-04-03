@@ -5,14 +5,14 @@ from std_msgs.msg import String
 
 class PIDSubscriber(Node):
 
-    def __init__(self, P, I, D, min, max, period):
-        super().__init__('pid_subscriber')
+    def __init__(self, name, topic_pub, topic_sub, P, I, D, min, max, period):
+        super().__init__(name)
         self.subscription = self.create_subscription(
             String,
-            'topic1',
+            topic_sub,
             self.pid_control,
             10)
-        self.publisher = self.create_publisher(String, 'topic2', 10)
+        self.publisher = self.create_publisher(String, topic_pub, 10)
         self.subscription  # prevent unused variable warning
         self.period = period
         self.P = P
@@ -49,8 +49,16 @@ class PIDSubscriber(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-
-    pid_subscriber = PIDSubscriber(1, 1, 0, 0, 100, 0.5)
+    name = "pid"
+    topic_pub = "pwm_to_motor"
+    topic_sub = "speed_to_pid"
+    P = 1
+    I = 1
+    D = 0
+    min = 0
+    max = 100
+    period = 0.5
+    pid_subscriber = PIDSubscriber(name, topic_pub, topic_sub, P, I, D, min, max, period)
 
     rclpy.spin(pid_subscriber)
 

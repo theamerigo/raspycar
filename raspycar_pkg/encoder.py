@@ -10,12 +10,12 @@ from std_msgs.msg import String
 
 class EncoderPublisher(Node):
 
-    def __init__(self, pin, period):
-        super().__init__('encoder_publisher')
-        self.publisher_ = self.create_publisher(String, 'topic1', 10)
+    def __init__(self, name, topic_pub, topic_sub,  pin, period):
+        super().__init__(name)
+        self.publisher_ = self.create_publisher(String, topic_pub, 10)
         self.subscription = self.create_subscription(
             String,
-            'topic3',
+            topic_sub,
             self.get_target,
             10)
         self.period = period   # seconds
@@ -57,7 +57,10 @@ def main(args=None):
     encoder_pin = 22
     period = 0.5
     rclpy.init(args=args)
-    encoder_publisher = EncoderPublisher(encoder_pin, period)
+    name = 'encoder'
+    topic_sub = 'ref_to_encoder'
+    topic_pub = 'speed_to_pid'
+    encoder_publisher = EncoderPublisher(name, topic_pub, topic_sub, encoder_pin, period)
     rclpy.spin(encoder_publisher)
 
     # Destroy the node explicitly

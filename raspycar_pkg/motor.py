@@ -7,11 +7,11 @@ import time
 
 class MotorSubscriber(Node):
 
-    def __init__(self, in1, in2, ena, period):
-        super().__init__('motor_subscriber')
+    def __init__(self, name, topic, in1, in2, ena, period):
+        super().__init__(name)
         self.subscription = self.create_subscription(
             String,
-            'topic2',
+            topic,
             self.control_motor,
             10)
         self.subscription  # prevent unused variable warning
@@ -42,8 +42,13 @@ class MotorSubscriber(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-
-    motor_subscriber = MotorSubscriber(17, 27, 13, 0.5)
+    name = "motor"
+    topic = "pwm_to_motor"
+    in1 = 17
+    in2 = 27
+    ena = 13
+    period = 0.5
+    motor_subscriber = MotorSubscriber(name, topic, in1, in2, ena, period)
 
     rclpy.spin(motor_subscriber)
 

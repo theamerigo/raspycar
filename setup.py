@@ -21,9 +21,9 @@ setup(
     entry_points={
         'console_scripts': [
                 'reference = raspycar_pkg.reference:main',
-                'encoder = raspycar_pkg.encoder:main',
-                'pid = raspycar_pkg.pid:main',
-                'motor = raspycar_pkg.motor:main',
+                'encoder = raspycar_pkg.encoderR:main',
+                'pid = raspycar_pkg.pidR:main',
+                'motor = raspycar_pkg.motorR:main',
         ],
     },
 )
