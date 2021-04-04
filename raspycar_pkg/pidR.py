@@ -4,9 +4,9 @@ from .pid import PIDSubscriber
 
 def main(args=None):
     rclpy.init(args=args)
-    name = "pid"
-    topic_pub = "pwm_to_motor"
-    topic_sub = "speed_to_pid"
+    name = "right_pid_control"
+    topic_pub = "pwm_to_motorR"
+    topic_sub = "speed_to_pidR"
     P = 1
     I = 1
     D = 0

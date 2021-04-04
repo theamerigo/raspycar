@@ -4,11 +4,11 @@ from .motor import MotorSubscriber
 
 def main(args=None):
     rclpy.init(args=args)
-    name = "motor"
-    topic = "pwm_to_motor"
-    in1 = 17
-    in2 = 27
-    ena = 13
+    name = "right_motor"
+    topic = "pwm_to_motorR"
+    in1 = 2
+    in2 = 3
+    ena = 4
     period = 0.5
     motor_subscriber = MotorSubscriber(name, topic, in1, in2, ena, period)
 

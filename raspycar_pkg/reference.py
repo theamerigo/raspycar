@@ -5,9 +5,10 @@ from std_msgs.msg import String
 
 class ReferencePublisher(Node):
 
-    def __init__(self, name, topic, period, speed):
+    def __init__(self, name, topic_R, topic_L, period, speed):
         super().__init__(name)
-        self.publisher_ = self.create_publisher(String, topic, 10)
+        self.publisherR = self.create_publisher(String, topic_R, 10)
+        self.publisherL = self.create_publisher(String, topic_L, 10)
         self.period = period  # seconds
         self.timer = self.create_timer(self.period, self.send_speed)
         self.i = 0
@@ -19,7 +20,8 @@ class ReferencePublisher(Node):
             msg.data = str(self.speed[self.i])
         else:
             msg.data = '0.0'
-        self.publisher_.publish(msg)
+        self.publisherR.publish(msg)
+        self.publisherL.publish(msg)
         self.get_logger().info('Publishing Reference: "%s"' % msg.data)
         self.i += 1
 
@@ -43,8 +45,9 @@ def main(args=None):
              32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
              32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32]
     node_name = "reference"
-    topic_name = "ref_to_encoder"
-    reference_publisher = ReferencePublisher(node_name, topic_name, period, speed)
+    topicR_name = "ref_to_encoderR"
+    topicL_name = "ref_to_encoderL"
+    reference_publisher = ReferencePublisher(node_name, topicR_name, topicL_name, period, speed)
 
     rclpy.spin(reference_publisher)
 
