@@ -23,8 +23,8 @@ class MotorSubscriber(Node):
         gpio.setup(self.in1, gpio.OUT)
         gpio.setup(self.in2, gpio.OUT)
         gpio.setup(self.ena, gpio.OUT)
-        gpio.output(self.in1,gpio.HIGH)
-        gpio.output(self.in2,gpio.LOW)
+        gpio.output(self.in1,gpio.LOW)
+        gpio.output(self.in2,gpio.HIGH)
         self.pwm = gpio.PWM(self.ena, 1000)
         self.pwm.start(0)
 
