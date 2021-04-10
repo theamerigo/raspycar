@@ -11,8 +11,8 @@ class PIDSubscriber(Node):
             String,
             topic_sub,
             self.pid_control,
-            10)
-        self.publisher = self.create_publisher(String, topic_pub, 10)
+            0)
+        self.publisher = self.create_publisher(String, topic_pub, 0)
         self.subscription  # prevent unused variable warning
         self.period = period
         self.P = P
@@ -39,7 +39,7 @@ class PIDSubscriber(Node):
             self.control = self.max
         elif self.control < self.min:
             self.control = self.min
-        self.get_logger().info('I calculate pid control = "%f"' % self.control)
+        #self.get_logger().info('I calculate pid control = "%f"' % self.control)
 
     def send_control(self):
         msg = String()

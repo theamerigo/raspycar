@@ -5,24 +5,29 @@ from std_msgs.msg import String
 
 class ReferencePublisher(Node):
 
-    def __init__(self, name, topic_R, topic_L, period, speed):
+    def __init__(self, name, topic_R, topic_L, period, speed_R, speed_L):
         super().__init__(name)
-        self.publisherR = self.create_publisher(String, topic_R, 10)
-        self.publisherL = self.create_publisher(String, topic_L, 10)
+        self.publisherR = self.create_publisher(String, topic_R, 0)
+        self.publisherL = self.create_publisher(String, topic_L, 0)
         self.period = period  # seconds
         self.timer = self.create_timer(self.period, self.send_speed)
         self.i = 0
-        self.speed = speed
+        self.speed_R = speed_R
+        self.speed_L = speed_L
 
     def send_speed(self):
-        msg = String()
-        if self.i < len(self.speed):
-            msg.data = str(self.speed[self.i])
+        msg_R = String()
+        msg_L = String()
+        if self.i < len(self.speed_L):
+            msg_L.data = str(self.speed_L[self.i])
+            msg_R.data = str(self.speed_R[self.i])
         else:
-            msg.data = '0.0'
-        self.publisherR.publish(msg)
-        self.publisherL.publish(msg)
-        self.get_logger().info('Publishing Reference: "%s"' % msg.data)
+            msg.dataL = '0.0'
+            msg.dataR = '0.0'
+        self.publisherR.publish(msg_R)
+        self.publisherL.publish(msg_L)
+        self.get_logger().info('Publishing Reference for Left Wheel: "%s"' % msg_L.data)
+        self.get_logger().info('Publishing Reference for Right Wheel: "%s"' % msg_R.data)
         self.i += 1
 
 
@@ -39,15 +44,31 @@ def main(args=None):
              25, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
              0, 0, 0, 0, 0]
     '''
-    speed = [32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
+    '''
+    speed_L = [32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
              32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
              32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
              32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
              32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32]
+    speed_R = [32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
+             32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
+             32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
+             32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
+             32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32]
+    '''
+    '''
+    speed_L = [0, 0, 0, 0, 0, 28, 28, 28, 0, 28, 28, 28, 0, 28, 28, 28, 0, 28,
+               28, 28, 0, 28, 28, 28, 0, 28, 28, 28, 0, 28, 28, 28, 0, 28, 28, 28, 0, 28, 28, 28, 0, 28, 28, 28, 0]
+    speed_R = [0, 0, 0, 0, 0, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28,
+             28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28,
+             28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 0]
+    '''
+    speed_L = [0, 0, 0, 0, 0, 15, 15, 15, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 0, 0, 0, 15, 15, 15, 0]
+    speed_R = [0, 0, 0, 0, 0, 15, 15, 15, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 0, 0, 0, 15, 15, 15, 0]
     node_name = "reference"
     topicR_name = "ref_to_encoderR"
     topicL_name = "ref_to_encoderL"
-    reference_publisher = ReferencePublisher(node_name, topicR_name, topicL_name, period, speed)
+    reference_publisher = ReferencePublisher(node_name, topicR_name, topicL_name, period, speed_R, speed_L)
 
     rclpy.spin(reference_publisher)
 

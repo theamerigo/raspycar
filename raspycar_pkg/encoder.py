@@ -10,14 +10,14 @@ from std_msgs.msg import String
 
 class EncoderPublisher(Node):
 
-    def __init__(self, name, topic_pub, topic_sub,  pin, period):
+    def __init__(self, name, topic_pub, topic_sub, pin, period):
         super().__init__(name)
-        self.publisher_ = self.create_publisher(String, topic_pub, 10)
+        self.publisher_ = self.create_publisher(String, topic_pub, 0)
         self.subscription = self.create_subscription(
             String,
             topic_sub,
             self.get_target,
-            10)
+            0)
         self.period = period   # seconds
         self.timer = self.create_timer(self.period, self.get_speed)
         self.pin = pin

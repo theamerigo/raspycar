@@ -13,7 +13,7 @@ class MotorSubscriber(Node):
             String,
             topic,
             self.control_motor,
-            10)
+            0)
         self.subscription  # prevent unused variable warning
         self.in1 = in1
         self.in2 = in2
