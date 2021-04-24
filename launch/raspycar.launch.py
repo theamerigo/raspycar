@@ -6,10 +6,6 @@ def generate_launch_description():
     return LaunchDescription([
         Node(
             package='raspycar_pkg',
-            executable='reference',
-        ),
-        Node(
-            package='raspycar_pkg',
             executable='encoderL',
         ),
         Node(
