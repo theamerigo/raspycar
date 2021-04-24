@@ -10,9 +10,11 @@ from std_msgs.msg import String
 
 class EncoderPublisher(Node):
 
-    def __init__(self, name, topic_pub, topic_sub, pin, period):
+    def __init__(self, name, topic_pub, topic_sub, topic_log, pin, period):
         super().__init__(name)
+        self.name = name
         self.publisher_ = self.create_publisher(String, topic_pub, 0)
+        self.logger = self.create_publisher(String, topic_log, 0)
         self.subscription = self.create_subscription(
             String,
             topic_sub,
@@ -36,6 +38,7 @@ class EncoderPublisher(Node):
 
     def get_speed(self):
         msg = String()
+        log = String()
         tps = self.tick / self.period
         rps = tps / 20
         self.speed = 2 * math.pi * rps
@@ -43,7 +46,9 @@ class EncoderPublisher(Node):
         #msg.data = 'Speed: %f' % self.speed
         #msg.data = str(self.speed)
         msg.data = str(self.speed) + ":" + str(self.target)
+        log.data = self.name + " publish: " + str(self.speed) + " rad/s"
         self.publisher_.publish(msg)
+        self.logger.publish(log)
         self.get_logger().info('Publishing Speed: "%s"' % msg.data)
 
     def encoder_signal_interrupt(self, channel):
@@ -53,21 +58,3 @@ def signal_handler(sig, frame):
     gpio.cleanup()
     sys.exit(0)
 
-def main(args=None):
-    encoder_pin = 22
-    period = 0.5
-    rclpy.init(args=args)
-    name = 'encoder'
-    topic_sub = 'ref_to_encoder'
-    topic_pub = 'speed_to_pid'
-    encoder_publisher = EncoderPublisher(name, topic_pub, topic_sub, encoder_pin, period)
-    rclpy.spin(encoder_publisher)
-
-    # Destroy the node explicitly
-    # (optional - otherwise it will be done automatically
-    # when the garbage collector destroys the node object)
-    encoder_publisher.destroy_node()
-    rclpy.shutdown()
-
-if __name__ == '__main__':
-    main()

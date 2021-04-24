@@ -9,7 +9,8 @@ def main(args=None):
     name = 'right_encoder'
     topic_sub = 'ref_to_encoderR'
     topic_pub = 'speed_to_pidR'
-    encoder_publisher = EncoderPublisher(name, topic_pub, topic_sub, encoder_pin, period)
+    topic_log = 'encoderR_logger'
+    encoder_publisher = EncoderPublisher(name, topic_pub, topic_sub, topic_log, encoder_pin, period)
     rclpy.spin(encoder_publisher)
 
     # Destroy the node explicitly
