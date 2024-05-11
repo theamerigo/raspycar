@@ -29,7 +29,7 @@ class EncoderPublisher(Node):
         gpio.setmode(gpio.BCM)
         print('Setup Interrupt on gpio ' + str(self.pin))
         gpio.setup(self.pin, gpio.IN, pull_up_down=gpio.PUD_UP)
-        gpio.add_event_detect(self.pin, gpio.RISING)
+        gpio.add_event_detect(self.pin, gpio.BOTH)
         gpio.add_event_callback(self.pin, self.encoder_signal_interrupt)
 
     def get_target(self, msg):
@@ -40,7 +40,7 @@ class EncoderPublisher(Node):
         msg = String()
         log = String()
         tps = self.tick / self.period
-        rps = tps / 20
+        rps = tps / 40 #conto fronti di salita e di discesa
         self.speed = 2 * math.pi * rps
         self.tick = 0
         #msg.data = 'Speed: %f' % self.speed
