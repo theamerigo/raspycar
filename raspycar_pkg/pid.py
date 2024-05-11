@@ -32,15 +32,15 @@ class PIDSubscriber(Node):
         vec = data.split(':')
         speed = float(vec[0])
         target = float(vec[1])
-        if target == 0.0:
-            self.integral = 0
         error = target - speed
         self.integral += error
         self.control = self.P * error + self.I * self.integral
         if self.control > self.max:
             self.control = self.max
+            self.integral -= error
         elif self.control < self.min:
             self.control = self.min
+            self.integral -= error
         #self.get_logger().info('I calculate pid control = "%f"' % self.control)
 
     def send_control(self):
