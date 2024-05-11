@@ -33,13 +33,13 @@ class OdometryPublisher(Node):
 
     def get_encoderL(self, msg):
         self.get_logger().info('I heard: "%s"' % msg.data)
-        data = msd.data
+        data = msg.data
         vec = data.split(":")
         self.omegaL = float(vec[0])
 
     def get_encoderR(self, msg):
         self.get_logger().info('I heard: "%s"' % msg.data)
-        data = msd.data
+        data = msg.data
         vec = data.split(":")
         self.omegaR = float(vec[0])
 
