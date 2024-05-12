@@ -27,6 +27,14 @@ def generate_launch_description():
         Node(
             package='raspycar_pkg',
             executable='motorR',
+        ),
+        Node(
+            package='raspycar_pkg',
+            executable='odometry',
+        ),
+        Node(
+            package='raspycar_pkg',
+            executable='path_planning',
         )
     ])
 

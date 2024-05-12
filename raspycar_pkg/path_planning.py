@@ -5,7 +5,7 @@ import math
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
-from numpy as np
+import numpy as np
 from numpy.linalg import inv
 
 
@@ -28,7 +28,7 @@ class PathPlanningPublisher(Node):
         self.r = wheel_radious
         self.l = wheels_distance
         self.J = np.array([[self.r/2, self.r/2],[-self.r/self.l, self.r/self.l]])
-        self.J_inv = inv(J)
+        self.J_inv = inv(self.J)
         self.initial_position = initial_position
         self.final_position = final_position
         self.x_t = initial_position[0]
@@ -61,7 +61,7 @@ class PathPlanningPublisher(Node):
         self.theta_t += self.theta_odometry
         theta_dot = self.k_theta * (self.theta_d - self.theta_t)
         v_b = math.sqrt((self.x_d - self.x_t) ** 2 + (self.y_d - self.y_t) ** 2)
-        res = np.dot(J_inv, np.array([v_b, theta_dot]))
+        res = np.dot(self.J_inv, np.array([v_b, theta_dot]))
         self.omegaR = res[0]
         self.omegaL = res[1]
         msgR.data = str(self.omegaR)
@@ -70,7 +70,7 @@ class PathPlanningPublisher(Node):
         self.publisherR.publish(msgR)
         self.publisherL.publish(msgL)
         self.logger.publish(log)
-        #self.get_logger().info('Publishing Odometry: "%s"' % log.data)
+        self.get_logger().info('Publishing angular velocities: "%s"' % log.data)
 
 
 def main(args=None):
@@ -83,7 +83,7 @@ def main(args=None):
     wheels_distance = 0.10 #m
     period = 0.5
     initial_position = [0, 0, 0]
-    final_position = [0.8, 0, 0]
+    final_position = [0.1, 0, 0]
     path_planning = PathPlanningPublisher(name, topic_pub, topic_sub, topic_log, wheel_radius, wheels_distance, initial_position, final_position, period)
 
     rclpy.spin(path_planning)

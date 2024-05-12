@@ -30,6 +30,8 @@ setup(
                 'pidL = raspycar_pkg.pidL:main',
                 'motorR = raspycar_pkg.motorR:main',
                 'motorL = raspycar_pkg.motorL:main',
+                'odometry = raspycar_pkg.odometry:main',
+                'path_planning = raspycar_pkg.path_planning:main',
         ],
     },
 )
