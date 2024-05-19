@@ -7,12 +7,12 @@ def main(args=None):
     name = "left_pid_control"
     topic_pub = "pwm_to_motorL"
     topic_sub = "speed_to_pidL"
-    P = 1
-    I = 1
+    P = 3.5
+    I = 2.25
     D = 0
     min = 0
     max = 100
-    period = 0.5
+    period = 0.25
     pid_subscriber = PIDSubscriber(name, topic_pub, topic_sub, P, I, D, min, max, period)
 
     rclpy.spin(pid_subscriber)

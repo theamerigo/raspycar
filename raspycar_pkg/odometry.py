@@ -9,7 +9,7 @@ from std_msgs.msg import String
 
 class OdometryPublisher(Node):
 
-    def __init__(self, name, topic_pub, topic_sub, topic_log, wheel_radius, wheels_distance, period):
+    def __init__(self, name, topic_pub, topic_sub, topic_log, wheel_radius, wheels_distance, theta_0, period):
         super().__init__(name)
         self.name = name
         self.publisher_ = self.create_publisher(String, topic_pub, 0)
@@ -29,16 +29,17 @@ class OdometryPublisher(Node):
         self.omegaR = 0
         self.r = wheel_radius
         self.l = wheels_distance
+        self.theta = theta_0
         self.timer = self.create_timer(self.period, self.send_odometry)
 
     def get_encoderL(self, msg):
-        self.get_logger().info('I heard: "%s"' % msg.data)
+        #self.get_logger().info('I heard: "%s"' % msg.data)
         data = msg.data
         vec = data.split(":")
         self.omegaL = float(vec[0])
 
     def get_encoderR(self, msg):
-        self.get_logger().info('I heard: "%s"' % msg.data)
+        #self.get_logger().info('I heard: "%s"' % msg.data)
         data = msg.data
         vec = data.split(":")
         self.omegaR = float(vec[0])
@@ -46,13 +47,16 @@ class OdometryPublisher(Node):
     def send_odometry(self):
         msg = String()
         log = String()
-        theta_dot = self.r / self.l * (self.omegaR - self.omegaL)
-        theta = theta_dot * self.period
-        x_dot = self.r / 2 * (self.omegaR + self.omegaL) * math.cos(theta)
+        #theta_dot = self.r / self.l * (self.omegaR - self.omegaL)
+        #self.theta += theta_dot * self.period
+        self.get_logger().info('I heard: omegaR = "%s" e omegaL = "%s"' % (self.omegaR, self.omegaL))
+        x_dot = self.r / 2 * (self.omegaR + self.omegaL) * math.cos(self.theta)
         x = x_dot * self.period
-        y_dot = self.r / 2 * (self.omegaR + self.omegaL) * math.sin(theta)
+        y_dot = self.r / 2 * (self.omegaR + self.omegaL) * math.sin(self.theta)
         y = y_dot * self.period
-        msg.data = str(x) + ":" + str(y) + ":" + str(theta)
+        theta_dot = self.r / self.l * (self.omegaR - self.omegaL)
+        self.theta += theta_dot * self.period
+        msg.data = str(x) + ":" + str(y) + ":" + str(self.theta)
         log.data = self.name + " publish: " + msg.data
         self.publisher_.publish(msg)
         self.logger.publish(log)
@@ -65,10 +69,11 @@ def main(args=None):
     topic_pub = "path_plannning_odometry"
     topic_sub = ["speed_to_pidL", "speed_to_pidR"]
     topic_log = "odometry_logger"
-    wheel_radius = 0.05 #m
-    wheels_distance = 0.10 #m
-    period = 0.5
-    odometry = OdometryPublisher(name, topic_pub, topic_sub, topic_log, wheel_radius, wheels_distance, period)
+    wheel_radius = 0.033 #m
+    wheels_distance = 0.12 #m
+    period = 0.25
+    theta_0 = 0
+    odometry = OdometryPublisher(name, topic_pub, topic_sub, topic_log, wheel_radius, wheels_distance, theta_0, period)
 
     rclpy.spin(odometry)
 

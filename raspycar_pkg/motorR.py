@@ -9,7 +9,7 @@ def main(args=None):
     in1 = 2
     in2 = 3
     ena = 4
-    period = 0.5
+    period = 0.25
     motor_subscriber = MotorSubscriber(name, topic, in1, in2, ena, period)
 
     rclpy.spin(motor_subscriber)

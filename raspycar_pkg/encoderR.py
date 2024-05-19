@@ -4,7 +4,7 @@ import rclpy
 
 def main(args=None):
     encoder_pin = 10
-    period = 0.5
+    period = 0.25
     rclpy.init(args=args)
     name = 'right_encoder'
     topic_sub = 'ref_to_encoderR'
