@@ -72,7 +72,7 @@ def main(args=None):
     wheel_radius = 0.033 #m
     wheels_distance = 0.12 #m
     period = 0.25
-    theta_0 = 0
+    theta_0 = math.pi/2
     odometry = OdometryPublisher(name, topic_pub, topic_sub, topic_log, wheel_radius, wheels_distance, theta_0, period)
 
     rclpy.spin(odometry)

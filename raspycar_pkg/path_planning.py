@@ -35,14 +35,16 @@ class PathPlanningPublisher(Node):
         self.final_position = final_position
         self.x_t = initial_position[0]
         self.y_t = initial_position[1]
-        #self.theta_t = initial_position[2]
-        self.theta_t = 0
+        self.theta_t = initial_position[2]
+        #self.theta_t = 0
         self.x_d = final_position[0]
         self.y_d = final_position[1]
         self.theta_d = np.arctan2(self.y_d - self.y_t, self.x_d - self.x_t)
         self.x_odometry = 0
         self.y_odometry = 0
         self.theta_odometry = 0
+        self.v_b = 0
+        self.v_b_pre = 0
         self.k_theta = k_theta
         self.k_v = k_v
         self.timer = self.create_timer(self.period, self.send_velocity)
@@ -64,20 +66,32 @@ class PathPlanningPublisher(Node):
         self.y_t += self.y_odometry
         self.theta_t = self.theta_odometry
         theta_dot = self.k_theta * (self.theta_d - self.theta_t)
-        v_b = math.sqrt((self.x_d - self.x_t) ** 2 + (self.y_d - self.y_t) ** 2)
-        if v_b < 0.25:
+        self.v_b_pre = self.v_b
+        self.v_b = math.sqrt((self.x_d - self.x_t) ** 2 + (self.y_d - self.y_t) ** 2)
+        self.get_logger().info('Path planning publish new v_b = "%s"' % str(self.v_b))
+        if self.v_b < 0.25 or self.v_b_pre < self.v_b:
             self.omegaR = 0
             self.omegaL = 0
         else:
-            res = np.dot(self.J_inv, np.array([v_b, theta_dot]))
-            if abs(res[0]) < self.omegaL_max:
-               self.omegaL = res[0]
-            else:
-               self.omegaL = self.omegaL_max
-            if abs(res[1]) < self.omegaR_max:
-               self.omegaR = res[1]
-            else:
-               self.omegaR = self.omegaR_max
+            res = np.dot(self.J_inv, np.array([self.v_b, theta_dot]))
+            self.omegaL = res[0]
+            self.omegaR = res[1]
+            diff = abs(self.omegaR - self.omegaL)
+            if self.omegaR > self.omegaR_max and self.omegaL > self.omegaL_max:
+                if self.omegaR > self.omegaL:
+                    self.omegaR = self.omegaR_max
+                    self.omegaL = self.omegaL_max - diff
+                else:
+                    self.omegaL = self.omegaL_max
+                    self.omegaR = self.omegaR_max - diff
+            elif self.omegaR > self.omegaR_max and self.omegaL <= self.omegaL_max:
+                diff = abs(self.omegaR - self.omegaR_max)
+                self.omegaR = self.omegaR_max
+                self.omegaL -= diff
+            elif self.omegaR <= self.omegaR_max and self.omegaL > self.omegaL_max:
+                diff = abs(self.omegaL - self.omegaL_max)
+                self.omegaL = self.omegaL_max
+                self.omegaR -= diff
         msgR.data = str(self.omegaR)
         msgL.data = str(self.omegaL)
         log.data = self.name + " publish: omegaR = " + msgR.data + " rad/r - omegaL = " + msgL.data + " rad/s"
@@ -98,14 +112,14 @@ def main(args=None):
     wheel_radius = 0.033 #m
     wheels_distance = 0.12 #m
     period = 0.25
-    initial_position = [0, 0, 0]
-    final_position = [1, 0, 0]
-    k_v = 0.00001
+    initial_position = [0, 0, math.pi/2]
+    final_position = [0, 1, 0]
+    k_v = 1
     k_theta = 1
-    omegaR_max = 500 #rad/s
-    omegaL_max = 500 #rad/s
+    omegaR_max = 12 #rad/s
+    omegaL_max = 12 #rad/s
     path_planning = PathPlanningPublisher(name, topic_pub, topic_sub, topic_log, k_v, k_theta, wheel_radius, wheels_distance, omegaR_max, omegaL_max, initial_position, final_position, period)
-
+    print(final_position)
     rclpy.spin(path_planning)
 
     # Destroy the node explicitly
