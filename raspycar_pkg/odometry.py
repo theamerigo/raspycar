@@ -9,11 +9,12 @@ from std_msgs.msg import String
 
 class OdometryPublisher(Node):
 
-    def __init__(self, name, topic_pub, topic_sub, topic_log, wheel_radius, wheels_distance, theta_0, period):
+    def __init__(self, name, topic_pub, topic_sub, topic_log, wheel_radius, wheels_distance, period):
         super().__init__(name)
         self.name = name
         self.publisher_ = self.create_publisher(String, topic_pub, 0)
         self.logger = self.create_publisher(String, topic_log, 0)
+        self.declare_parameter('theta0', 0.0)
         self.subscriptionL = self.create_subscription(
             String,
             topic_sub[0],
@@ -29,6 +30,7 @@ class OdometryPublisher(Node):
         self.omegaR = 0
         self.r = wheel_radius
         self.l = wheels_distance
+        theta_0 = self.get_parameter('theta0').value
         self.theta = theta_0
         self.timer = self.create_timer(self.period, self.send_odometry)
 
@@ -69,11 +71,11 @@ def main(args=None):
     topic_pub = "path_plannning_odometry"
     topic_sub = ["speed_to_pidL", "speed_to_pidR"]
     topic_log = "odometry_logger"
-    wheel_radius = 0.033 #m
-    wheels_distance = 0.12 #m
+    wheel_radius = 0.04 #m
+    wheels_distance = 0.13 #m
     period = 0.25
-    theta_0 = math.pi/2
-    odometry = OdometryPublisher(name, topic_pub, topic_sub, topic_log, wheel_radius, wheels_distance, theta_0, period)
+    #theta_0 = -math.pi
+    odometry = OdometryPublisher(name, topic_pub, topic_sub, topic_log, wheel_radius, wheels_distance, period)
 
     rclpy.spin(odometry)
 

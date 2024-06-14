@@ -31,10 +31,17 @@ def generate_launch_description():
         Node(
             package='raspycar_pkg',
             executable='odometry',
+            parameters=[
+                {'theta0': -3.14159}
+            ]
         ),
         Node(
             package='raspycar_pkg',
             executable='path_planning',
+            parameters=[
+                {'p0': [0, 0, -3.14159],
+                 'pF': [1.5, 0, 0]}
+            ]
         )
     ])
 

@@ -11,7 +11,7 @@ from numpy.linalg import inv
 
 class PathPlanningPublisher(Node):
 
-    def __init__(self, name, topic_pub, topic_sub, topic_log, k_v, k_theta, wheel_radious, wheels_distance, omegaR_max, omegaL_max, initial_position, final_position, period):
+    def __init__(self, name, topic_pub, topic_sub, topic_log, k_v, k_theta, wheel_radious, wheels_distance, omegaR_max, omegaL_max, period):
         super().__init__(name)
         self.name = name
         self.publisherL = self.create_publisher(String, topic_pub[0], 0)
@@ -22,6 +22,8 @@ class PathPlanningPublisher(Node):
             topic_sub,
             self.get_odometry,
             0)
+        self.declare_parameter('p0', [0.0, 0.0, 0.0])
+        self.declare_parameter('pF', [0.0, 0.0, 0.0])
         self.period = period   # seconds
         self.omegaL = 0
         self.omegaR = 0
@@ -31,14 +33,14 @@ class PathPlanningPublisher(Node):
         self.omegaL_max = omegaL_max
         self.J = np.array([[self.r/2, self.r/2],[-self.r/self.l, self.r/self.l]])
         self.J_inv = inv(self.J)
-        self.initial_position = initial_position
-        self.final_position = final_position
-        self.x_t = initial_position[0]
-        self.y_t = initial_position[1]
-        self.theta_t = initial_position[2]
+        self.initial_position = self.get_parameter('p0').value
+        self.final_position = self.get_parameter('pF').value
+        self.x_t = self.initial_position[0]
+        self.y_t = self.initial_position[1]
+        self.theta_t = self.initial_position[2]
         #self.theta_t = 0
-        self.x_d = final_position[0]
-        self.y_d = final_position[1]
+        self.x_d = self.final_position[0]
+        self.y_d = self.final_position[1]
         self.theta_d = np.arctan2(self.y_d - self.y_t, self.x_d - self.x_t)
         self.x_odometry = 0
         self.y_odometry = 0
@@ -65,6 +67,7 @@ class PathPlanningPublisher(Node):
         self.x_t += self.x_odometry
         self.y_t += self.y_odometry
         self.theta_t = self.theta_odometry
+        self.theta_d = np.arctan2(self.y_d - self.y_t, self.x_d - self.x_t)
         theta_dot = self.k_theta * (self.theta_d - self.theta_t)
         self.v_b_pre = self.v_b
         self.v_b = math.sqrt((self.x_d - self.x_t) ** 2 + (self.y_d - self.y_t) ** 2)
@@ -109,17 +112,16 @@ def main(args=None):
     topic_pub = ["ref_to_encoderL", "ref_to_encoderR"]
     topic_sub = "path_plannning_odometry"
     topic_log = "path_planning_logger"
-    wheel_radius = 0.033 #m
-    wheels_distance = 0.12 #m
+    wheel_radius = 0.04 #m
+    wheels_distance = 0.13 #m
     period = 0.25
-    initial_position = [0, 0, math.pi/2]
-    final_position = [0, 1, 0]
+    #initial_position = [0, 0, -math.pi]
+    #final_position = [2, 0, 0]
     k_v = 1
     k_theta = 1
-    omegaR_max = 12 #rad/s
-    omegaL_max = 12 #rad/s
-    path_planning = PathPlanningPublisher(name, topic_pub, topic_sub, topic_log, k_v, k_theta, wheel_radius, wheels_distance, omegaR_max, omegaL_max, initial_position, final_position, period)
-    print(final_position)
+    omegaR_max = 10 #rad/s
+    omegaL_max = 10 #rad/s
+    path_planning = PathPlanningPublisher(name, topic_pub, topic_sub, topic_log, k_v, k_theta, wheel_radius, wheels_distance, omegaR_max, omegaL_max, period)
     rclpy.spin(path_planning)
 
     # Destroy the node explicitly
